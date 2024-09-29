@@ -18,14 +18,29 @@ typedef struct HtmlElement {
     struct HtmlElement* next;
 } HtmlElement;
 
-typedef struct HtmlTable {
+
+
+typedef struct HtmlTableFormal {
     HtmlElement* thead;
     HtmlElement* tbody;
     HtmlElement* tfoot;
+} HtmlTableFormal;
+
+typedef struct HtmlTableBasic {
     HtmlElement* tr;
     HtmlElement* tr_next;
-} HtmlTable;
+} HtmlTableBasic;
 
+
+
+typedef struct HtmlTable {
+    union
+    {
+        HtmlTableFormal formal;
+        HtmlTableBasic basic;
+    } styledTable;
+    int style;
+} HtmlTable;
 
 // Function to parse an HTML tag
 int parse_tag(char* buffer, char** tag_name, char** attributes) {
@@ -168,10 +183,9 @@ HtmlAttribute* parse_attributes(char* attribute_str) {
 }
 
 void parse_html_table(char* html, HtmlTable* table) {
-
-    table->thead = NULL;
-    table->tbody = NULL;
-    table->tfoot = NULL;
+    // table->thead = NULL;
+    // table->tbody = NULL;
+    // table->tfoot = NULL;
 
     HtmlElement* current_element = NULL;
     HtmlElement* current_row = NULL;
@@ -188,7 +202,8 @@ void parse_html_table(char* html, HtmlTable* table) {
                 if (strcmp(tag_name, "table") == 0) {
                     // Parse table attributes
                 } else if (strcmp(tag_name, "thead") == 0) {
-                    table->thead = current_element = malloc(sizeof(HtmlElement));
+                    table->style = 1;
+                    table->styledTable.formal = current_element = malloc(sizeof(HtmlElement));
                     current_element->tag_name = strdup(tag_name);
                     // current_element->attributes = parse_attributes(attributes);
                     current_element->children = NULL;
@@ -268,8 +283,8 @@ int main() {
 
     parse_html_table(html, &table);
 
-    const char* a = table.tr->tag_name;
+    // const char* a = table.tr->tag_name;
 
-    printf("%s", a);
+    // printf("%s", a);
     return 0;
 }
