@@ -22,6 +22,8 @@ typedef struct HtmlTable {
     HtmlElement* thead;
     HtmlElement* tbody;
     HtmlElement* tfoot;
+    HtmlElement* tr;
+    HtmlElement* tr_next;
 } HtmlTable;
 
 
@@ -166,7 +168,7 @@ HtmlAttribute* parse_attributes(char* attribute_str) {
 }
 
 void parse_html_table(char* html, HtmlTable* table) {
-   
+
     table->thead = NULL;
     table->tbody = NULL;
     table->tfoot = NULL;
@@ -188,25 +190,25 @@ void parse_html_table(char* html, HtmlTable* table) {
                 } else if (strcmp(tag_name, "thead") == 0) {
                     table->thead = current_element = malloc(sizeof(HtmlElement));
                     current_element->tag_name = strdup(tag_name);
-                    current_element->attributes = parse_attributes(attributes);
+                    // current_element->attributes = parse_attributes(attributes);
                     current_element->children = NULL;
                     current_element->next = NULL;
                 } else if (strcmp(tag_name, "tbody") == 0) {
                     table->tbody = current_element = malloc(sizeof(HtmlElement));
                     current_element->tag_name = strdup(tag_name);
-                    current_element->attributes = parse_attributes(attributes);
+                    //current_element->attributes = parse_attributes(attributes);
                     current_element->children = NULL;
                     current_element->next = NULL;
                 } else if (strcmp(tag_name, "tfoot") == 0) {
                     table->tfoot = current_element = malloc(sizeof(HtmlElement));
                     current_element->tag_name = strdup(tag_name);
-                    current_element->attributes = parse_attributes(attributes);
+                    //current_element->attributes = parse_attributes(attributes);
                     current_element->children = NULL;
                     current_element->next = NULL;
                 } else if (strcmp(tag_name, "tr") == 0) {
                     current_row = current_element = malloc(sizeof(HtmlElement));
                     current_element->tag_name = strdup(tag_name);
-                    current_element->attributes = parse_attributes(attributes);
+                    //current_element->attributes = parse_attributes(attributes);
                     current_element->children = NULL;
                     current_element->next = NULL;
                     if (table->thead) {
@@ -215,11 +217,17 @@ void parse_html_table(char* html, HtmlTable* table) {
                         table->tbody->children = current_element;
                     } else if (table->tfoot) {
                         table->tfoot->children = current_element;
+                    } else {
+                        if (table->tr) {
+                            table->tr->children = current_element;
+                        } else {
+                            table->tr = current_element;
+                        }
                     }
                 } else if (strcmp(tag_name, "th") == 0 || strcmp(tag_name, "td") == 0) {
                     HtmlElement* cell = malloc(sizeof(HtmlElement));
                     cell->tag_name = strdup(tag_name);
-                    cell->attributes = parse_attributes(attributes);
+                    //cell->attributes = parse_attributes(attributes);
                     cell->text_content = NULL;
                     cell->children = NULL;
                     cell->next = NULL;
@@ -254,12 +262,14 @@ int main() {
                   "  </tr>"
                   "</table>";
 
-    parse_table(html);
+    // parse_table(html);
 
-    HtmlTable* table = malloc(sizeof(HtmlTable));
+    HtmlTable table;
 
-    parse_html_table(html, table);
+    parse_html_table(html, &table);
 
-    printf("%s", table->thead->tag_name);
+    const char* a = table.tr->tag_name;
+
+    printf("%s", a);
     return 0;
 }
